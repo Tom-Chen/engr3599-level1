@@ -18,11 +18,31 @@ def fail (msg):
 
 
 GRID_SIZE = 6
-
+CAR_LENGTHS = {"O" : 3}
+CARS = {"o" : [1,3 , 'h', 2]}
 
 def validate_move (brd,move):
     # FIX ME!
     # check that piece is on the board
+    if CARS[move[0]]:
+        if move[1] == "u" and CARS[move[0]] == "v":
+            if (CARS[move[0]][0] - move[2] >= 0): 
+        if move[1] == "d" and CARS[move[0]] == "v":
+            if (CARS[move[0]][0] + CARS[move[0]][3] + move[2] <= (GRID_SIZE)): 
+
+        if move[1] == "l" and CARS[move[0]] == "h":
+            if (CARS[move[0]][1] - move[2] >= 0): 
+
+        if move[1] == "r" and CARS[move[0]] == "h":
+            if (CARS[move[0]][1] + CARS[move[0]][3] + move[2] <= (GRID_SIZE)):  
+
+        else:
+            print "car is in the wrong direction"
+    else:
+        print "car is a lie"
+
+
+    print "oh no!!! that is not a valid car :("
     # check that piece placed so it can move in that direction
     # check that piece would be in bound
     # check that path to target position is free
