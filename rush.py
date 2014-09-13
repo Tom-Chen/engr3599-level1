@@ -25,6 +25,31 @@ CARS = {'a' : [3,1 , 'h', 2],
         'p' : [3,5 , 'v', 3],
         'x' : [2,1 , 'h', 2],}
 
+def check_path(brd, move):
+    row = CARS[move[0]][0]
+    col = CARS[move[0]][1]
+    leng = CARS[move[0]][3]
+    if move[1] == 'u':
+        for spot in range(0,int(move[2])):
+            print brd[row-spot-1][col]
+            if brd[row-spot-1][col] != '.':
+                print "there is a car in your way"
+    elif move[1] == 'd':
+        for spot in range(0,int(move[2])):
+            if brd[row+spot+leng][col] != '.':
+                print "there is a car in your way"
+    elif move[1] == 'l':
+        for spot in range(0,int(move[2])):
+            print brd[row][col-spot-1]
+            if brd[row][col-spot-1] != '.':
+                print "there is a car in your way"
+    elif move[1] == 'r':
+        for spot in range(0,int(move[2])):
+            if brd[row][col+spot+leng] != '.':
+                print "there is a car in your way"
+    else:
+        print "that is not a valid move"
+
 def validate_move (brd,move):
     # check that piece is on the board
     # check that piece placed so it can move in that direction
@@ -32,22 +57,22 @@ def validate_move (brd,move):
     if CARS[move[0]]:
         if move[1] == 'u' and CARS[move[0]][2] == 'v':
             if (CARS[move[0]][0] - int(move[2]) >= 0):
-                print 'yay you are in the boundaries' 
+                check_path(brd, move) 
             else:
                 print 'you done messed up now'
         elif move[1] == 'd' and CARS[move[0]][2] == 'v':
             if (CARS[move[0]][0] + CARS[move[0]][3] + int(move[2]) <= (GRID_SIZE)): 
-                print 'yay you are in the boundaries' 
+                check_path(brd, move) 
             else:
                 print 'you done messed up now'
         elif move[1] == 'l' and CARS[move[0]][2] == 'h':
             if (CARS[move[0]][1] - int(move[2]) >= 0): 
-                print 'yay you are in the boundaries' 
+                check_path(brd, move) 
             else:
                 print 'you done messed up now'
         elif move[1] == 'r' and CARS[move[0]][2] == 'h':
             if (CARS[move[0]][1] + CARS[move[0]][3] + int(move[2]) <= (GRID_SIZE)):  
-                print 'yay you are in the boundaries' 
+                check_path(brd, move)  
             else:
                 print 'you done messed up now'
         else:
@@ -93,15 +118,13 @@ def create_initial_level ():
     for carname, car in CARS.items():
       if car[2] == 'h':
         for spot in range(0,car[3]):
-          # print car[0], car[1]+spot, board[car[0]]
           board[car[0]][car[1]+spot] = carname
       elif car[2] == 'v':
         for spot in range(0,car[3]):
-          # print car[0]+spot, car[1], board[car[0]+spot]
           board[car[0]+spot][car[1]] = carname
     for row in board:
       print(row)
-    return None
+    return board
 
 
 def main ():
