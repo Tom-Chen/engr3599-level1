@@ -16,52 +16,54 @@
 def fail (msg):
     raise StandardError(msg)
 
-
 GRID_SIZE = 6
-CAR_LENGTHS = {"O" : 3}
-CARS = {"o" : [1,3 , 'h', 2]}
+CAR_LENGTHS = {'o' : 3}
+CARS = {'a' : [3,1 , 'h', 2],
+        'b' : [4,1 , 'v', 2],
+        'c' : [5,2 , 'h', 2],
+        'o' : [0,3 , 'v', 3],
+        'p' : [3,5 , 'v', 3],
+        'x' : [2,1 , 'h', 2],}
 
 def validate_move (brd,move):
-    # FIX ME!
     # check that piece is on the board
-    if CARS[move[0]]:
-        if move[1] == "u" and CARS[move[0]] == "v":
-            if (CARS[move[0]][0] - move[2] >= 0):
-                print "yay you are in the boudries" 
-            else:
-                print "you done messed up now"
-        if move[1] == "d" and CARS[move[0]] == "v":
-            if (CARS[move[0]][0] + CARS[move[0]][3] + move[2] <= (GRID_SIZE)): 
-                print "yay you are in the boudries" 
-            else:
-                print "you done messed up now"
-        if move[1] == "l" and CARS[move[0]] == "h":
-            if (CARS[move[0]][1] - move[2] >= 0): 
-                print "yay you are in the boudries" 
-            else:
-                print "you done messed up now"
-        if move[1] == "r" and CARS[move[0]] == "h":
-            if (CARS[move[0]][1] + CARS[move[0]][3] + move[2] <= (GRID_SIZE)):  
-                print "yay you are in the boudries" 
-            else:
-                print "you done messed up now"
-        else:
-            print "car is in the wrong direction"
-    else:
-        print "car is a lie"
-    print "oh no!!! that is not a valid car :("
     # check that piece placed so it can move in that direction
     # check that piece would be in bound
+    if CARS[move[0]]:
+        if move[1] == 'u' and CARS[move[0]][2] == 'v':
+            if (CARS[move[0]][0] - int(move[2]) >= 0):
+                print 'yay you are in the boundaries' 
+            else:
+                print 'you done messed up now'
+        elif move[1] == 'd' and CARS[move[0]][2] == 'v':
+            if (CARS[move[0]][0] + CARS[move[0]][3] + int(move[2]) <= (GRID_SIZE)): 
+                print 'yay you are in the boundaries' 
+            else:
+                print 'you done messed up now'
+        elif move[1] == 'l' and CARS[move[0]][2] == 'h':
+            if (CARS[move[0]][1] - int(move[2]) >= 0): 
+                print 'yay you are in the boundaries' 
+            else:
+                print 'you done messed up now'
+        elif move[1] == 'r' and CARS[move[0]][2] == 'h':
+            if (CARS[move[0]][1] + CARS[move[0]][3] + int(move[2]) <= (GRID_SIZE)):  
+                print 'yay you are in the boundaries' 
+            else:
+                print 'you done messed up now'
+        else:
+            print 'car is in the wrong direction'
+    else:
+        print 'car is a lie'
     # check that path to target position is free
     return False
 
 
 def read_player_input (brd):
-    move = raw_input("Select Car, Direction, and Distance")
-    if move.len() != 3:
-        print "Please input needed information"
+    move = raw_input('Select Car, Direction, and Distance: ')
+    if len(move) != 3:
+        print '3 characters plz'
     else:
-        return move
+        return validate_move(brd, move)
 
 
 
@@ -75,7 +77,7 @@ def update_board (brd,move):
 
 def print_board (brd):
     # FIX ME!
-    print "<some output of the board>"
+    print '<some output of the board>'
 
     
 def done (brd):
@@ -95,8 +97,20 @@ def done (brd):
 
 
 def create_initial_level ():
-    board = [0] * (GRID_SIZE * GRID_SIZE)
-
+    board = []
+    for i in range(0, GRID_SIZE):
+      board.append(['.'] * GRID_SIZE)
+    for carname, car in CARS.items():
+      if car[2] == 'h':
+        for spot in range(0,car[3]):
+          # print car[0], car[1]+spot, board[car[0]]
+          board[car[0]][car[1]+spot] = carname
+      elif car[2] == 'v':
+        for spot in range(0,car[3]):
+          # print car[0]+spot, car[1], board[car[0]+spot]
+          board[car[0]+spot][car[1]] = carname
+    for row in board:
+      print(row)
     return None
 
 
@@ -106,7 +120,7 @@ def main ():
 
     print_board(brd)
 
-    while not done(brd):
+    while done(brd):
         move = read_player_input(brd)
         brd = update_board(brd,move)
         print_board(brd)
