@@ -85,16 +85,6 @@ def done (brd):
     return True
 
 
-# initial board:
-# Board positions (1-6,1-6), directions 'r' or 'd'
-#
-# X @ (2,3) r
-# A @ (2,4) r
-# B @ (2,5) d
-# C @ (3,6) r
-# O @ (4,3) d
-# P @ (6,4) d
-
 
 def create_initial_level ():
     board = []
