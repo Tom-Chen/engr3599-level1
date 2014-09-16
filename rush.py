@@ -31,56 +31,60 @@ def check_path(brd, move):
     leng = CARS[move[0]][3]
     if move[1] == 'u':
         for spot in range(0,int(move[2])):
-            print brd[row-spot-1][col]
             if brd[row-spot-1][col] != '.':
-                print "there is a car in your way"
+                return False
     elif move[1] == 'd':
         for spot in range(0,int(move[2])):
             if brd[row+spot+leng][col] != '.':
-                print "there is a car in your way"
+                return False
     elif move[1] == 'l':
         for spot in range(0,int(move[2])):
-            print brd[row][col-spot-1]
             if brd[row][col-spot-1] != '.':
-                print "there is a car in your way"
+                return False
     elif move[1] == 'r':
         for spot in range(0,int(move[2])):
             if brd[row][col+spot+leng] != '.':
-                print "there is a car in your way"
+                return False
     else:
         print "that is not a valid move"
+        return False
+    return True
 
 def validate_move (brd,move):
     # check that piece is on the board
     # check that piece placed so it can move in that direction
     # check that piece would be in bound
-    if CARS[move[0]]:
+    if move[0] in CARS:
         if move[1] == 'u' and CARS[move[0]][2] == 'v':
             if (CARS[move[0]][0] - int(move[2]) >= 0):
-                check_path(brd, move) 
+                return check_path(brd, move) 
             else:
                 print 'you done messed up now'
+                return False
         elif move[1] == 'd' and CARS[move[0]][2] == 'v':
             if (CARS[move[0]][0] + CARS[move[0]][3] + int(move[2]) <= (GRID_SIZE)): 
-                check_path(brd, move) 
+                return check_path(brd, move) 
             else:
                 print 'you done messed up now'
+                return False
         elif move[1] == 'l' and CARS[move[0]][2] == 'h':
             if (CARS[move[0]][1] - int(move[2]) >= 0): 
-                check_path(brd, move) 
+                return check_path(brd, move) 
             else:
                 print 'you done messed up now'
+                return False
         elif move[1] == 'r' and CARS[move[0]][2] == 'h':
             if (CARS[move[0]][1] + CARS[move[0]][3] + int(move[2]) <= (GRID_SIZE)):  
-                check_path(brd, move)  
+                return check_path(brd, move)  
             else:
                 print 'you done messed up now'
+                return False
         else:
             print 'car is in the wrong direction'
+            return False
     else:
         print 'car is a lie'
-    # check that path to target position is free
-    return False
+        return False
 
 
 def read_player_input (brd):
@@ -88,26 +92,52 @@ def read_player_input (brd):
     if len(move) != 3:
         print '3 characters plz'
     else:
-        return validate_move(brd, move)
-
-
-
-    return None
+        if(validate_move(brd, move)):
+          return move
+    # dummy move
+    return 'xr0'
 
 
 def update_board (brd,move):
-    # FIX ME!
+    row = CARS[move[0]][0]
+    col = CARS[move[0]][1]
+    leng = CARS[move[0]][3]
+    # delete old bitz
+    if (CARS[move[0]][2] == 'h'):
+      for spot in range(0,leng):
+        brd[row][col+spot] = '.' 
+    elif (CARS[move[0]][2] == 'v'):
+      for spot in range(0,leng):
+        brd[row+spot][col] = '.' 
+    # add new bitz
+    if (move[1] == 'd'):
+      CARS[move[0]][0] = row + int(move[2])
+      for spot in range(0,leng):
+        brd[row+spot+int(move[2])][col] = move[0]
+    elif (move[1] == 'r'):
+      CARS[move[0]][1] = col + int(move[2])
+      for spot in range(0,leng):
+        brd[row][col+spot+int(move[2])] = move[0]
+    elif (move[1] == 'u'):
+      CARS[move[0]][0] = row - int(move[2])
+      for spot in range(0,leng):
+        brd[row+spot-int(move[2])][col] = move[0]
+    elif (move[1] == 'l'):
+      CARS[move[0]][1] = col - int(move[2])
+      for spot in range(0,leng):
+        brd[row][col+spot-int(move[2])] = move[0]
+    
     return brd
 
 
 def print_board (brd):
-    # FIX ME!
-    print '<some output of the board>'
+    for row in brd:
+      print(row)
 
     
 def done (brd):
-    # FIX ME!
-    return True
+    if (check_path(brd, 'xr' + str(GRID_SIZE - CARS['x'][0]))):
+      return True
 
 
 
@@ -122,8 +152,6 @@ def create_initial_level ():
       elif car[2] == 'v':
         for spot in range(0,car[3]):
           board[car[0]+spot][car[1]] = carname
-    for row in board:
-      print(row)
     return board
 
 
@@ -133,7 +161,7 @@ def main ():
 
     print_board(brd)
 
-    while done(brd):
+    while not done(brd):
         move = read_player_input(brd)
         brd = update_board(brd,move)
         print_board(brd)
