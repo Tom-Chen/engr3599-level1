@@ -10,6 +10,7 @@
 #
 
 from graphics import *
+from math import floor
 
 # fail somewhat gracefully
 
@@ -18,6 +19,8 @@ def fail (msg):
 
 GRID_SIZE = 6
 CARS = {}
+WIN = GraphWin("My Square", 400, 400)
+
 
 def check_path(brd, move):
     row = CARS[move[0]][0]
@@ -82,14 +85,11 @@ def validate_move (brd,move):
 
 
 def read_player_input (brd):
-    move = raw_input('Select Car, Direction, and Distance: ')
-    if len(move) != 3:
-        print '3 characters plz'
-    else:
-        if(validate_move(brd, move)):
-          return move
-    # dummy move
-    return 'xr0'
+  point = WIN.getMouse()
+  print (floor((point.getY()-30)/60), floor((point.getX()-30)/60))
+  if brd[int(floor((point.getY()-30)/60))][int(floor((point.getX()-30)/60))] != ".":
+    print "yay"
+
 
 
 def update_board (brd,move):
@@ -149,25 +149,33 @@ def create_initial_level ():
     return board
 
 def draw_board():
-  win = GraphWin("My Square", 350, 350)
-  c = Rectangle(Point(20,20), Point(280, 280))
-  c.draw(win)
-  for i in range(0,5):
-    for j in range(0,5):
-      c = Rectangle(Point(i*50+20+10,j*50+20+10),Point(i*50 + 70,j*50 +70))
-      c.draw(win)
-  win.getMouse() # pause for click in window
-  win.close()
+  c = Rectangle(Point(20,20), Point(330, 330))
+  c.draw(WIN)
+
+  for i in range(0,6):
+    for j in range(0,6):
+      c = Rectangle(Point(i*50+30,j*50+30),Point(i*50 + 70,j*50 +70))
+      c.draw(WIN)
+
+  for carname, car in CARS.items():
+    if car[2] == 'r':
+        c = Rectangle(Point(car[1]*50+30,car[0]*50+30), Point(car[1]*50+20+50*car[3], car[0]*50+70))
+        c.setFill(car[4])
+        c.draw(WIN)
+    elif car[2] == 'd':
+        c = Rectangle(Point(car[1]*50+30,car[0]*50+30), Point(car[1]*50+70, car[0]*50+20+50*car[3]))
+        c.setFill(car[4])
+        c.draw(WIN)
 
 def main ():
-    draw_board()
     global CARS
-    CARS = {'a' : [3,1 , 'r', 2],
-            'b' : [4,1 , 'd', 2],
-            'c' : [5,2 , 'r', 2],
-            'o' : [0,3 , 'd', 3],
-            'p' : [3,5 , 'd', 3],
-            'x' : [2,1 , 'r', 2],}
+    CARS = {'a' : [3,1 , 'r', 2, "blue"],
+            'b' : [4,1 , 'd', 2, "blue"],
+            'c' : [5,2 , 'r', 2, "blue"],
+            'o' : [0,3 , 'd', 3, "purple"],
+            'p' : [3,5 , 'd', 3, "purple"],
+            'x' : [2,1 , 'r', 2, "red"],}
+    draw_board()
     brd = create_initial_level()
     print_board(brd)
 
@@ -177,16 +185,19 @@ def main ():
         print_board(brd)
 
     print 'YOU WIN! (Yay...)\n'
-    
+    WIN.close()
+
 def main_with_initial(desc):
     draw_board()
     import string
     desc = desc.lower()
     for i in xrange(0,len(desc),4):
-      if (string.lowercase.index(desc[i]) <= 9 or string.lowercase.index(desc[i]) == 23):
-        CARS[desc[i]] = [int(desc[i+2])-1, int(desc[i+1])-1, desc[i+3], 2]
+      if (string.lowercase.index(desc[i]) <= 9):
+        CARS[desc[i]] = [int(desc[i+2])-1, int(desc[i+1])-1, desc[i+3], 2, "blue"]
+      elif (string.lowercase.index(desc[i]) == 23):
+        CARS[desc[i]] = [int(desc[i+2])-1, int(desc[i+1])-1, desc[i+3], 2, "red"]
       else:
-        CARS[desc[i]] = [int(desc[i+2])-1, int(desc[i+1])-1, desc[i+3], 3]
+        CARS[desc[i]] = [int(desc[i+2])-1, int(desc[i+1])-1, desc[i+3], 3, "purple"]
       
     brd = create_initial_level()
     print_board(brd)
