@@ -17,13 +17,7 @@ def fail (msg):
     raise StandardError(msg)
 
 GRID_SIZE = 6
-CAR_LENGTHS = {'o' : 3}
-CARS = {'a' : [3,1 , 'h', 2],
-        'b' : [4,1 , 'v', 2],
-        'c' : [5,2 , 'h', 2],
-        'o' : [0,3 , 'v', 3],
-        'p' : [3,5 , 'v', 3],
-        'x' : [2,1 , 'h', 2],}
+CARS = {}
 
 def check_path(brd, move):
     row = CARS[move[0]][0]
@@ -55,25 +49,25 @@ def validate_move (brd,move):
     # check that piece placed so it can move in that direction
     # check that piece would be in bound
     if move[0] in CARS:
-        if move[1] == 'u' and CARS[move[0]][2] == 'v':
+        if move[1] == 'u' and CARS[move[0]][2] == 'd':
             if (CARS[move[0]][0] - int(move[2]) >= 0):
                 return check_path(brd, move) 
             else:
                 print 'you done messed up now'
                 return False
-        elif move[1] == 'd' and CARS[move[0]][2] == 'v':
+        elif move[1] == 'd' and CARS[move[0]][2] == 'd':
             if (CARS[move[0]][0] + CARS[move[0]][3] + int(move[2]) <= (GRID_SIZE)): 
                 return check_path(brd, move) 
             else:
                 print 'you done messed up now'
                 return False
-        elif move[1] == 'l' and CARS[move[0]][2] == 'h':
+        elif move[1] == 'l' and CARS[move[0]][2] == 'r':
             if (CARS[move[0]][1] - int(move[2]) >= 0): 
                 return check_path(brd, move) 
             else:
                 print 'you done messed up now'
                 return False
-        elif move[1] == 'r' and CARS[move[0]][2] == 'h':
+        elif move[1] == 'r' and CARS[move[0]][2] == 'r':
             if (CARS[move[0]][1] + CARS[move[0]][3] + int(move[2]) <= (GRID_SIZE)):  
                 return check_path(brd, move)  
             else:
@@ -103,10 +97,10 @@ def update_board (brd,move):
     col = CARS[move[0]][1]
     leng = CARS[move[0]][3]
     # delete old bitz
-    if (CARS[move[0]][2] == 'h'):
+    if (CARS[move[0]][2] == 'r'):
       for spot in range(0,leng):
         brd[row][col+spot] = '.' 
-    elif (CARS[move[0]][2] == 'v'):
+    elif (CARS[move[0]][2] == 'd'):
       for spot in range(0,leng):
         brd[row+spot][col] = '.' 
     # add new bitz
@@ -146,19 +140,24 @@ def create_initial_level ():
     for i in range(0, GRID_SIZE):
       board.append(['.'] * GRID_SIZE)
     for carname, car in CARS.items():
-      if car[2] == 'h':
+      if car[2] == 'r':
         for spot in range(0,car[3]):
           board[car[0]][car[1]+spot] = carname
-      elif car[2] == 'v':
+      elif car[2] == 'd':
         for spot in range(0,car[3]):
           board[car[0]+spot][car[1]] = carname
     return board
 
 
 def main ():
-
+    global CARS
+    CARS = {'a' : [3,1 , 'r', 2],
+            'b' : [4,1 , 'd', 2],
+            'c' : [5,2 , 'r', 2],
+            'o' : [0,3 , 'd', 3],
+            'p' : [3,5 , 'd', 3],
+            'x' : [2,1 , 'r', 2],}
     brd = create_initial_level()
-
     print_board(brd)
 
     while not done(brd):
@@ -167,7 +166,29 @@ def main ():
         print_board(brd)
 
     print 'YOU WIN! (Yay...)\n'
-        
+    
+def main_with_initial(desc):
+    import string
+    desc = desc.lower()
+    for i in xrange(0,len(desc),4):
+      if (string.lowercase.index(desc[i]) <= 9 or string.lowercase.index(desc[i]) == 23):
+        CARS[desc[i]] = [int(desc[i+2])-1, int(desc[i+1])-1, desc[i+3], 2]
+      else:
+        CARS[desc[i]] = [int(desc[i+2])-1, int(desc[i+1])-1, desc[i+3], 3]
+      
+    brd = create_initial_level()
+    print_board(brd)
+
+    while not done(brd):
+        move = read_player_input(brd)
+        brd = update_board(brd,move)
+        print_board(brd)
+
+    print 'YOU WIN! (Yay...)\n'
 
 if __name__ == '__main__':
-    main()
+    import sys
+    if len(sys.argv) > 1:
+        main_with_initial (sys.argv[1])
+    else:
+        main()
