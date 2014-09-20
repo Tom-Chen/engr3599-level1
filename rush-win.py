@@ -83,12 +83,30 @@ def validate_move (brd,move):
         print 'car is a lie'
         return False
 
+def draw_car(car, color):
+  if car[2] == 'r':
+    c = Rectangle(Point(car[1]*50+30,car[0]*50+30), Point(car[1]*50+20+50*car[3], car[0]*50+70))
+    c.setFill(color)
+    c.draw(WIN)
+  elif car[2] == 'd':
+    c = Rectangle(Point(car[1]*50+30,car[0]*50+30), Point(car[1]*50+70, car[0]*50+20+50*car[3]))
+    c.setFill(color)
+    c.draw(WIN)
 
 def read_player_input (brd):
   point = WIN.getMouse()
-  print (floor((point.getY()-30)/60), floor((point.getX()-30)/60))
-  if brd[int(floor((point.getY()-30)/60))][int(floor((point.getX()-30)/60))] != ".":
-    print "yay"
+  carname = brd[(point.getY()-30)/50][(point.getX()-30)/50]
+  if carname != ".":
+    draw_car(CARS[carname], "yellow")
+    move = WIN.getKey()
+    if move == "Up" or "Down" or "Left" or "Right":
+      if validate_move(brd, carname+move[0].lower()+"1"):
+        update_board(brd,carname+move[0].lower()+"1")
+      draw_board()
+    else :
+      print "that is not a valid move"
+    
+    
 
 
 
@@ -124,13 +142,10 @@ def update_board (brd,move):
     return brd
 
 
-def print_board (brd):
-    for row in brd:
-      print(row)
 
     
 def done (brd):
-    if (check_path(brd, 'xr' + str(GRID_SIZE - CARS['x'][0]))):
+    if (check_path(brd, 'xr' + str(GRID_SIZE - CARS['x'][0] - 1))):
       return True
 
 
@@ -150,22 +165,21 @@ def create_initial_level ():
 
 def draw_board():
   c = Rectangle(Point(20,20), Point(330, 330))
+  c.setFill("grey")
   c.draw(WIN)
+
+  d = Polygon(Point(340,130), Point(340,170), Point(370,150))
+  d.setFill("green")
+  d.draw(WIN)
 
   for i in range(0,6):
     for j in range(0,6):
       c = Rectangle(Point(i*50+30,j*50+30),Point(i*50 + 70,j*50 +70))
+      c.setFill("white")
       c.draw(WIN)
 
   for carname, car in CARS.items():
-    if car[2] == 'r':
-        c = Rectangle(Point(car[1]*50+30,car[0]*50+30), Point(car[1]*50+20+50*car[3], car[0]*50+70))
-        c.setFill(car[4])
-        c.draw(WIN)
-    elif car[2] == 'd':
-        c = Rectangle(Point(car[1]*50+30,car[0]*50+30), Point(car[1]*50+70, car[0]*50+20+50*car[3]))
-        c.setFill(car[4])
-        c.draw(WIN)
+    draw_car(car, car[4])
 
 def main ():
     global CARS
@@ -177,18 +191,15 @@ def main ():
             'x' : [2,1 , 'r', 2, "red"],}
     draw_board()
     brd = create_initial_level()
-    print_board(brd)
 
     while not done(brd):
         move = read_player_input(brd)
-        brd = update_board(brd,move)
-        print_board(brd)
+        #brd = update_board(brd,move)
 
     print 'YOU WIN! (Yay...)\n'
     WIN.close()
 
 def main_with_initial(desc):
-    draw_board()
     import string
     desc = desc.lower()
     for i in xrange(0,len(desc),4):
@@ -198,14 +209,13 @@ def main_with_initial(desc):
         CARS[desc[i]] = [int(desc[i+2])-1, int(desc[i+1])-1, desc[i+3], 2, "red"]
       else:
         CARS[desc[i]] = [int(desc[i+2])-1, int(desc[i+1])-1, desc[i+3], 3, "purple"]
-      
+    draw_board()   
     brd = create_initial_level()
-    print_board(brd)
 
     while not done(brd):
         move = read_player_input(brd)
         brd = update_board(brd,move)
-        print_board(brd)
+
 
     print 'YOU WIN! (Yay...)\n'
 
