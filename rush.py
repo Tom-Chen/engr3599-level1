@@ -82,7 +82,7 @@ def validate_move (brd,move):
 
 
 def read_player_input (brd):
-    move = raw_input('Select Car, Direction, and Distance: ')
+    move = raw_input('Select Car, Direction, and Distance: ').lower()
     if len(move) != 3:
         print '3 characters plz'
     else:
@@ -126,7 +126,10 @@ def update_board (brd,move):
 
 def print_board (brd):
     for row in brd:
-      print(row)
+        if 'x' in row:
+            print row, ">>>"
+        else:
+            print(row)
 
     
 def done (brd):

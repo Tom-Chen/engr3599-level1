@@ -8,6 +8,8 @@
 # A simple puzzle game, based on the physical game of the same name 
 # by Binary Arts Corp
 #
+# People in the Team: Jazmin Gonzalez-Rivero, Thomas Chen  
+#
 
 from graphics import *
 from math import floor
