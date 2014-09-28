@@ -8,8 +8,9 @@
 #
 # A simple strategy game, an extension of the standard 3x3 tic-tac-toe
 #
-
+from graphics import *
 import sys
+WIN = GraphWin("My Square", 400, 400)
 
 WIN_SEQUENCES = [
     [0,1,2,3],
@@ -77,16 +78,23 @@ def read_player_input (board, player):
         if move == 'q':
             exit(0)
         if len(move)>0 and ((int(move[3])-1)*4+int(move[1])-1) in valid:
-            return (int(move[3]),int(move[1]))
+            return (int(move[1]),int(move[3]))
+
+def wait_player_input (board,player):
+    point = WIN.getMouse()
+    pos = board[(point.getY()-30)/50*4 + (point.getX()-30)/50]
+    if pos == ".":
+        return((point.getX()-30)/50+1, (point.getY()-30)/50+1)
+
 
 def make_move (board,move,player):
     new_board = board[:]
     new_board[(move[1]-1)*4+move[0]-1] = player
     return new_board
 
+
 def computer_move (board,player):
     return (2,2)
-
 
 def other (player):
     if player == 'X':
@@ -99,7 +107,7 @@ def run (str,player,playX,playO):
     board = create_board(str)
 
     print_board(board)
-
+    draw_board(board)
     while not done(board):
         if player == 'X':
             move = playX(board,player)
@@ -109,6 +117,7 @@ def run (str,player,playX,playO):
             fail('Unrecognized player '+player)
         board = make_move(board,move,player)
         print_board(board)
+        draw_board(board)
         player = other(player)
 
     winner = has_win(board)
@@ -117,12 +126,29 @@ def run (str,player,playX,playO):
     else:
         print 'Draw'
         
-def main ():
-    run('.' * 16, 'X', read_player_input, computer_move)
+def draw_board(board):
+    c = Rectangle(Point(20,20), Point(230, 230))
+    c.setFill("dark grey")
+    c.draw(WIN)
 
+    for i in range(0,4):
+        for j in range(0,4):
+            c = Rectangle(Point(i*50+30,j*50+30),Point(i*50 +70,j*50 +70))   
+            c.setFill("white")
+            c.draw(WIN)
+
+            if board[(j)*4+i] != ".":
+                d = Text(Point(i*50+50, j*50+50),board[(j)*4+i])
+                d.setFill("black")
+                d.draw(WIN)
+
+def main ():
+    run('.' * 16, 'X', wait_player_input, computer_move)
+    # run('.' * 16, 'X', read_player_input, computer_move)
 
 PLAYER_MAP = {
-    'human': read_player_input,
+    'human': wait_player_input,
+    # 'human': read_player_input,
     'computer': computer_move
 }
 
@@ -131,8 +157,10 @@ if __name__ == '__main__':
   try:
       str = sys.argv[1] if len(sys.argv)>1 else '.' * 16
       player = sys.argv[2] if len(sys.argv)>3 else 'X'
-      playX = PLAYER_MAP[sys.argv[3]] if len(sys.argv)>3 else read_player_input
+      playX = PLAYER_MAP[sys.argv[3]] if len(sys.argv)>3 else wait_player_input
+      # playX = PLAYER_MAP[sys.argv[3]] if len(sys.argv)>3 else read_player_input
       playO = PLAYER_MAP[sys.argv[4]] if len(sys.argv)>4 else computer_move
+
   except:
     print 'Usage: %s [starting board] [X|O] [human|computer] [human|computer]' % (sys.argv[0])
     exit(1)
