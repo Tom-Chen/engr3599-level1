@@ -31,7 +31,9 @@ MARK_VALUE = {
 
 
 def initialize_board ():
+    # return ['O','X','O','X','X','O',' ',' ',' ']
     return [' '] * 9
+    # return['O','X',' ',' ',' ','X','O',' ',' ']
 
 
 # returns 'O' if the board is a win for O
@@ -89,7 +91,7 @@ def utility (board):
         return -1
     if has_win(board) == 'X':
         return 1
-    elif has_win == False:
+    elif has_win(board) == False:
         return 0
 
 def min_max(board):
@@ -97,32 +99,31 @@ def min_max(board):
     current = []
 
     def min_value (board):
-        if ' ' not in board:
+        if (' ' not in board) or utility(board) != 0:
             return utility(board)
+        smallestBranch = 2
         for move in possible_moves(board):
-            smallestBranch = 2
             tempValue = max_value(make_move(board,move,'O'))
             if tempValue < smallestBranch:
                 smallestBranch = tempValue
-        current.append(smallestBranch)
+        return(smallestBranch)
 
     def max_value (board):
-        if ' ' not in board:
+        if (' ' not in board) or utility(board) != 0:
             return utility(board)
+        largestBranch = -2
         for move in possible_moves(board):
-            largestBranch = -2
             tempValue = min_value(make_move(board,move,'X'))
             if tempValue > largestBranch:
                 largestBranch = tempValue
-        current.append(largestBranch)
+        return(largestBranch)
 
 
     all_moves = []
     all_results = []
     for move in possible_moves(board):
         current = []
-        max_value(make_move(board,move,'O'))
-        all_results.append(max(current))
+        all_results.append(max_value(make_move(board,move,'O')))
         all_moves.append(move)
     print all_moves
     print all_results
