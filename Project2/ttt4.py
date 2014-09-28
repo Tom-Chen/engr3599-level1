@@ -33,6 +33,13 @@ MARK_VALUE = {
 def fail (msg):
     raise StandardError(msg)
 
+def makeCoordinates(pos):
+    x = (pos % 4) + 1
+    y = (pos // 4) + 1
+    return (x,y)
+
+def makePos(coord):
+  return ((coord[1]-1)*4+coord[0]-1)
 
 def create_board (stri):
     board = []
@@ -49,10 +56,12 @@ def create_board (stri):
 
 
 def has_mark (board,x,y):
-    if board[(y-1)*4+x-1] == ".":
+    space = board[makePos((x,y))]
+    if space == ".":
         return False
     else:
-        return board[(y-1)*4+x-1]
+        return space
+
 def has_win (board):
     for positions in WIN_SEQUENCES:
         s = sum(MARK_VALUE[board[pos]] for pos in positions)
@@ -73,26 +82,75 @@ def print_board (board):
 def read_player_input (board, player):
     valid = [ i for (i,e) in enumerate(board) if e == '.']
     while True:
-        move = raw_input('(1-4,1-4): ')
+        move = raw_input('1-4,1-4: ')
         if move == 'q':
             exit(0)
-        if len(move)>0 and ((int(move[3])-1)*4+int(move[1])-1) in valid:
-            return (int(move[3]),int(move[1]))
+        if len(move)>0 and ((int(move[2])-1)*4+int(move[0])-1) in valid:
+            return (int(move[0]),int(move[2]))
 
 def make_move (board,move,player):
+    print(move)
     new_board = board[:]
-    new_board[(move[1]-1)*4+move[0]-1] = player
+    new_board[makePos(move)] = player
     return new_board
 
 def computer_move (board,player):
-    return (2,2)
+    best_move_pos = best_move(board,player)
+    return (best_move_pos)
 
-
+def best_move (board,player):
+    pos, val = min_max(board,player)
+    return pos[val.index(min(val))]
+    
 def other (player):
     if player == 'X':
         return 'O'
     return 'X'
 
+def utility (board,player):
+    if has_win(board) == player:
+        return -1
+    if has_win(board) == other(player):
+        return 1
+    elif has_win(board) == False:
+        return 0
+
+def min_max(board,player):
+    possible_moves = [ makeCoordinates(i) for (i,e) in enumerate(board) if e == '.']
+    current = []
+
+    ally = player
+    enemy = other(player)
+    
+    def min_value (board,player):
+        if (' ' not in board) or utility(board) != 0:
+            return utility(board,ally)
+        smallestBranch = 2
+        for move in possible_moves:
+            tempValue = max_value(make_move(board,move,ally),enemy)
+            if tempValue < smallestBranch:
+                smallestBranch = tempValue
+        return(smallestBranch)
+
+    def max_value (board,player):
+        if (' ' not in board) or utility(board) != 0:
+            return utility(board, other(player))
+        largestBranch = -2
+        for move in possible_moves:
+            tempValue = min_value(make_move(board,move,enemy),ally)
+            if tempValue > largestBranch:
+                largestBranch = tempValue
+        return(largestBranch)
+
+    all_moves = []
+    all_results = []
+    for move in possible_moves:
+        current = []
+        all_results.append(max_value(make_move(board,move,ally),enemy))
+        all_moves.append(move)
+    print all_moves
+    print all_results
+    return all_moves, all_results
 
 def run (str,player,playX,playO): 
 
@@ -116,10 +174,9 @@ def run (str,player,playX,playO):
         print winner,'wins!'
     else:
         print 'Draw'
-        
+
 def main ():
     run('.' * 16, 'X', read_player_input, computer_move)
-
 
 PLAYER_MAP = {
     'human': read_player_input,
@@ -137,5 +194,3 @@ if __name__ == '__main__':
     print 'Usage: %s [starting board] [X|O] [human|computer] [human|computer]' % (sys.argv[0])
     exit(1)
   run(str,player,playX,playO)
-
-
