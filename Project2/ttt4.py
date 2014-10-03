@@ -46,7 +46,7 @@ def create_board (stri):
     board = []
     if len(stri) == 16:
         for letter in stri:
-            if letter != '.' and 'X' and 'O':
+            if letter != '.' and letter != 'X' and letter != 'O':
                 print "invalid symbol on board, please re input values"
             else:
                 board.append(letter)
@@ -93,13 +93,12 @@ def wait_player_input (board,player):
     point = WIN.getMouse()
     pos = board[(point.getY()-30)/50*4 + (point.getX()-30)/50]
     if pos == ".":
-        return((point.getX()-30)/50+1, (point.getY()-30)/50+1)
+        return ((point.getY()-30)/50*4 + (point.getX()-30)/50)
 
 
 def make_move (board,move,player):
-    print(move)
     new_board = board[:]
-    new_board[makePos(move)] = player
+    new_board[move] = player
     return new_board
 
 
@@ -116,46 +115,44 @@ def other (player):
         return 'O'
     return 'X'
 
-def utility (board,player):
-    if has_win(board) == player:
+def possible_moves (board):
+    return [i for (i,e) in enumerate(board) if e == '.']
+
+def utility (board,player1, player2):
+    if has_win(board) == player1:
         return -1
-    if has_win(board) == other(player):
+    if has_win(board) == player2:
         return 1
     elif has_win(board) == False:
         return 0
 
 def min_max(board,player):
-    possible_moves = [ makeCoordinates(i) for (i,e) in enumerate(board) if e == '.']
     current = []
 
     ally = player
     enemy = other(player)
     
-    def min_value (board,player):
-        if (' ' not in board) or utility(board) != 0:
-            return utility(board,ally)
-        smallestBranch = 2
-        for move in possible_moves:
-            tempValue = max_value(make_move(board,move,ally),enemy)
-            if tempValue < smallestBranch:
-                smallestBranch = tempValue
-        return(smallestBranch)
+    def min_value (board):
+        if ('.' not in board) or utility(board, ally, enemy) != 0:
+            return utility(board,ally, enemy)
+        smallestBranch = []
+        for move in possible_moves(board):
+            smallestBranch.append(max_value(make_move(board,move,ally)))
+        return min(smallestBranch)
 
-    def max_value (board,player):
-        if (' ' not in board) or utility(board) != 0:
-            return utility(board, other(player))
-        largestBranch = -2
-        for move in possible_moves:
-            tempValue = min_value(make_move(board,move,enemy),ally)
-            if tempValue > largestBranch:
-                largestBranch = tempValue
-        return(largestBranch)
+    def max_value (board):
+        if ('.' not in board) or utility(board, ally, enemy) != 0:
+            return utility(board, ally, enemy)
+        largestBranch = []
+        for move in possible_moves(board):
+            largestBranch.append(min_value(make_move(board,move,enemy)))
+        return max(largestBranch)
 
     all_moves = []
     all_results = []
-    for move in possible_moves:
+    for move in possible_moves(board):
         current = []
-        all_results.append(max_value(make_move(board,move,ally),enemy))
+        all_results.append(max_value(make_move(board,move,ally)))
         all_moves.append(move)
     print all_moves
     print all_results
