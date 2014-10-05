@@ -10,7 +10,10 @@
 #
 from graphics import *
 import sys
+import cProfile
 WIN = GraphWin("My Square", 400, 400)
+import math 
+KNOWN_STATUS = {}
 
 WIN_SEQUENCES = [
     [0,1,2,3],
@@ -130,22 +133,48 @@ def min_max(board,player):
     current = []
 
     ally = player
-    enemy = other(player)
+    enemy = other(player)   
     
+    def rotateSave(board, branch):
+        boardString = "".join(board)
+        testboard = []
+        small = min(branch)
+        large = max(branch)
+        for i in range(0,16):
+            testboard.append(board[int(16 - (4 * ((i%4)+1)) + math.floor(i/4))])
+        KNOWN_STATUS["".join(testboard)] = (small, large)
+        for i in range(0,16):
+            testboard.append(board[int(15 - i)])
+        KNOWN_STATUS["".join(testboard)] = (small, large)
+        for i in range(0,16):
+            testboard.append(board[int((4 * ((i%4)+1)) - (math.floor(i/4)+1))])
+        KNOWN_STATUS["".join(testboard)] = (small, large)
+        KNOWN_STATUS[boardString] = (small, large)
+
     def min_value (board):
+        boardString = "".join(board)
+        if boardString in KNOWN_STATUS:
+            s,l = KNOWN_STATUS[boardString]
+            return s
         if ('.' not in board) or utility(board, ally, enemy) != 0:
             return utility(board,ally, enemy)
         smallestBranch = []
         for move in possible_moves(board):
             smallestBranch.append(max_value(make_move(board,move,ally)))
+        rotateSave(board,smallestBranch)
         return min(smallestBranch)
 
     def max_value (board):
+        boardString = "".join(board)
+        if boardString in KNOWN_STATUS:
+            s,l = KNOWN_STATUS[boardString]
+            return l
         if ('.' not in board) or utility(board, ally, enemy) != 0:
             return utility(board, ally, enemy)
         largestBranch = []
         for move in possible_moves(board):
             largestBranch.append(min_value(make_move(board,move,enemy)))
+        rotateSave(board, largestBranch)
         return max(largestBranch)
 
     all_moves = []
@@ -220,4 +249,4 @@ if __name__ == '__main__':
   except:
     print 'Usage: %s [starting board] [X|O] [human|computer] [human|computer]' % (sys.argv[0])
     exit(1)
-  run(str,player,playX,playO)
+  cProfile.run('run(str,player,playX,playO)')
