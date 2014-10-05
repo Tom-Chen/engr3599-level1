@@ -137,18 +137,18 @@ def min_max(board,player):
     
     def rotateSave(board, branch):
         boardString = "".join(board)
-        testboard = []
+        testboard1 = []
+        testboard2 = []
+        testboard3 = []
         small = min(branch)
         large = max(branch)
         for i in range(0,16):
-            testboard.append(board[int(16 - (4 * ((i%4)+1)) + math.floor(i/4))])
-        KNOWN_STATUS["".join(testboard)] = (small, large)
-        for i in range(0,16):
-            testboard.append(board[int(15 - i)])
-        KNOWN_STATUS["".join(testboard)] = (small, large)
-        for i in range(0,16):
-            testboard.append(board[int((4 * ((i%4)+1)) - (math.floor(i/4)+1))])
-        KNOWN_STATUS["".join(testboard)] = (small, large)
+            testboard1.append(board[int(16 - (4 * ((i%4)+1)) + math.floor(i/4))])
+            testboard2.append(board[int((4 * ((i%4)+1)) - (math.floor(i/4)+1))])     
+            testboard3.append(board[int(15 - i)])
+        KNOWN_STATUS["".join(testboard1)] = (small, large)
+        KNOWN_STATUS["".join(testboard2)] = (small, large)
+        KNOWN_STATUS["".join(testboard3)] = (small, large)
         KNOWN_STATUS[boardString] = (small, large)
 
     def min_value (board):
