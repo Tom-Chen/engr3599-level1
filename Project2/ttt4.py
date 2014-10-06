@@ -12,6 +12,7 @@
 # This can lead to it ignoring an instant win but winning a few turns later.
 # The program caches boards and all their rotations as it comes across them, so the first move takes the longest.
 # Under default conditions where the human goes first, the computer takes about four minutes to make its first move on our laptops
+# Requires you to specify a board if you want to change the first player or player mapping
 
 from graphics import *
 import sys
