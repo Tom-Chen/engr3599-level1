@@ -7,11 +7,16 @@
 # TIC-TAC-TOE 4
 #
 # A simple strategy game, an extension of the standard 3x3 tic-tac-toe
+
 # Thomas Chen + Jazmin Gonzalez-Rivero
+
 # Note: Program always picks the first "best move", meaning it does not take number of moves to the win into account.
 # This can lead to it ignoring an instant win but winning a few turns later.
+
 # The program caches boards and all their rotations as it comes across them, so the first move takes the longest.
-# Under default conditions where the human goes first, the computer takes about four minutes to make its first move on our laptops
+# The computer takes about four minutes to make its first move on our laptops since it's caching every single board
+# Following computer moves are pretty fast since it's just looking up the move
+
 # Requires you to specify a board if you want to change the first player or player mapping
 
 from graphics import *
