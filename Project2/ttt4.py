@@ -7,11 +7,16 @@
 # TIC-TAC-TOE 4
 #
 # A simple strategy game, an extension of the standard 3x3 tic-tac-toe
-#
+# Thomas Chen + Jazmin Gonzalez-Rivero
+# Note: Program always picks the first "best move", meaning it does not take number of moves to the win into account.
+# This can lead to it ignoring an instant win but winning a few turns later.
+# The program caches boards and all their rotations as it comes across them, so the first move takes the longest.
+# Under default conditions where the human goes first, the computer takes about four minutes to make its first move on our laptops
+
 from graphics import *
 import sys
 import cProfile
-WIN = GraphWin("My Square", 400, 400)
+WIN = GraphWin("4x4 TicTacToe", 400, 400)
 import math 
 KNOWN_STATUS = {}
 
@@ -50,11 +55,11 @@ def create_board (stri):
     if len(stri) == 16:
         for letter in stri:
             if letter != '.' and letter != 'X' and letter != 'O':
-                print "invalid symbol on board, please re input values"
+                sys.exit("Invalid symbol on board, please re-input values.")
             else:
                 board.append(letter)
     else:
-        print "that is not a valid board, please reinput values"
+        sys.exit("That is not a valid board, please re-input values.")
     return board
 
 
@@ -93,10 +98,14 @@ def read_player_input (board, player):
             return (int(move[0]),int(move[2]))
 
 def wait_player_input (board,player):
-    point = WIN.getMouse()
-    pos = board[(point.getY()-30)/50*4 + (point.getX()-30)/50]
-    if pos == ".":
-        return ((point.getY()-30)/50*4 + (point.getX()-30)/50)
+    while True:
+      point = WIN.getMouse()
+      try:
+        pos = board[(point.getY())/100*4 + (point.getX())/100]
+        if pos == ".":
+            return ((point.getY())/100*4 + (point.getX())/100)
+      except:
+        continue
 
 
 def make_move (board,move,player):
@@ -199,7 +208,7 @@ def run (str,player,playX,playO):
         elif player == 'O':
             move = playO(board,player)
         else:
-            fail('Unrecognized player '+player)
+            sys.exit('Unrecognized player '+player)
         board = make_move(board,move,player)
         print_board(board)
         draw_board(board)
@@ -212,18 +221,17 @@ def run (str,player,playX,playO):
         print 'Draw'
         
 def draw_board(board):
-    c = Rectangle(Point(20,20), Point(230, 230))
-    c.setFill("dark grey")
-    c.draw(WIN)
-
+    # c = Rectangle(Point(0,0), Point(210, 210))
+    # c.setFill("dark grey")
+    # c.draw(WIN)
     for i in range(0,4):
         for j in range(0,4):
-            c = Rectangle(Point(i*50+30,j*50+30),Point(i*50 +70,j*50 +70))   
+            c = Rectangle(Point(i*100,j*100),Point(i*100 +100,j*100 +100))   
             c.setFill("white")
             c.draw(WIN)
 
             if board[(j)*4+i] != ".":
-                d = Text(Point(i*50+50, j*50+50),board[(j)*4+i])
+                d = Text(Point(i*100+50, j*100+50),board[(j)*4+i])
                 d.setFill("black")
                 d.draw(WIN)
 
@@ -240,7 +248,7 @@ PLAYER_MAP = {
 if __name__ == '__main__':
 
   try:
-      str = sys.argv[1] if len(sys.argv)>1 else '.' * 16
+      str = sys.argv[1].upper() if len(sys.argv)>1 else '.' * 16
       player = sys.argv[2] if len(sys.argv)>3 else 'X'
       playX = PLAYER_MAP[sys.argv[3]] if len(sys.argv)>3 else wait_player_input
       # playX = PLAYER_MAP[sys.argv[3]] if len(sys.argv)>3 else read_player_input
@@ -249,4 +257,5 @@ if __name__ == '__main__':
   except:
     print 'Usage: %s [starting board] [X|O] [human|computer] [human|computer]' % (sys.argv[0])
     exit(1)
-  cProfile.run('run(str,player,playX,playO)')
+  # cProfile.run('r un(str,player,playX,playO)')
+  run(str,player,playX,playO)
